@@ -204,16 +204,16 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [x] 1.8 Commit + CI verde
 
 ### Fase 2 — Player MVP
-- [ ] 2.1 `PlaybackService : MediaSessionService` + ExoPlayer (foreground `mediaPlayback`)
-- [ ] 2.2 `PlayerController`: fila de contexto + fila manual "a seguir" + shuffle bag + repeat off/all/one, alimentando 1 MediaItem por vez (port de `playbackengine.cpp`)
-- [ ] 2.3 Testes unitários da lógica de fila/shuffle/repeat
-- [ ] 2.4 PlayerBar persistente (com vinil girando, respeitando reduce-motion; coração de like)
-- [ ] 2.5 NowPlayingScreen + QueueSheet com reordenar/remover/limpar
-- [ ] 2.6 Notificação de mídia + lockscreen + Bluetooth + media keys (via session)
-- [ ] 2.7 Restore de sessão: autosave 30 s + eventos (pause/troca/destroy); restore no boot do serviço sem "seek kick"
-- [ ] 2.8 `play_count`/`last_played_at` (mesmo gatilho do desktop) + `pendingPlayDelta`
-- [ ] 2.9 AddMusic mínimo: SAF multi-pick, parse "Artist - Título", tocar por URI
-- [ ] 2.10 **E2E**: importar 3 arquivos → tocar → enfileirar → matar o app → reabrir → sessão restaurada → controlar pela notificação e por fone Bluetooth
+- [x] 2.1 `PlaybackService : MediaSessionService` + ExoPlayer (foreground `mediaPlayback`)
+- [x] 2.2 `PlayerController`: fila de contexto + fila manual "a seguir" + shuffle bag + repeat off/all/one, alimentando 1 MediaItem por vez (port de `playbackengine.cpp`)
+- [x] 2.3 Testes unitários da lógica de fila/shuffle/repeat
+- [x] 2.4 PlayerBar persistente (com vinil girando, respeitando reduce-motion; coração de like)
+- [x] 2.5 NowPlayingScreen + QueueSheet com reordenar/remover/limpar
+- [x] 2.6 Notificação de mídia + lockscreen + Bluetooth + media keys (via session)
+- [x] 2.7 Restore de sessão: autosave 30 s + eventos (pause/troca/destroy); restore no boot do serviço sem "seek kick"
+- [x] 2.8 `play_count`/`last_played_at` (mesmo gatilho do desktop) + `pendingPlayDelta`
+- [x] 2.9 AddMusic mínimo: SAF multi-pick, parse "Artist - Título", tocar por URI
+- [x] 2.10 **E2E**: importar 3 arquivos → tocar → enfileirar → matar o app → reabrir → sessão restaurada → controlar pela notificação e por fone Bluetooth
 
 ### Fase 3 — Paridade de telas
 - [ ] 3.1 Playlists: criar/renomear/deletar, capa gradiente (2 cores) ou imagem, lightbox
@@ -335,4 +335,13 @@ Passos para este projeto:
   - ⚠️ **Bug de layout achado só rodando, não compilando**: `fillMaxHeight()` nos itens da bottom nav fazia a barra reivindicar todo o espaço livre da Column e esmagar a área de conteúdo (a tela ficava vazia com a barra no meio). Trocado por altura fixa. Reforça a lição do projeto irmão: compilar não é rodar
   - ⚠️ **Nunca editar fonte UTF-8 com `Get-Content`/`Set-Content` do PowerShell 5.1**: o round-trip leu o arquivo como ANSI e regravou como UTF-8, duplicando a codificação e destruindo todos os acentos do `Palettes.kt`. Usar a ferramenta de edição direta
   - Acabamentos que só a captura de tela revelou: nome da paleta não estava traduzido (virou `labelRes` apontando para os recursos) e os ícones das barras de sistema não seguiam o tema do app (agora `WindowCompat` acompanha a luminância de `colors.app`)
-- ⏭️ Próximo passo: Fase 2 (player MVP com MediaSessionService)
+- ✅ **FASE 2 CONCLUÍDA** (2026-08-24). 39 testes verdes (15 novos da fila). E2E completo validado no emulador. Registros:
+  - `PlayerQueue` é **pura, sem nenhuma dependência de Android**: opera só sobre ids. Isso permitiu portar a semântica exata do `PlaybackEngine` e testá-la (precedência da fila manual, baralho Fisher–Yates que não repete até esgotar, preservação do `contextIndex` no desvio pela fila manual). O ExoPlayer recebe **um MediaItem por vez** — não usamos a playlist interna do Media3
+  - ⚠️ **`addSession(session)` é obrigatório** no `MediaSessionService`. Sem ele a sessão até existe e as teclas de mídia funcionam, mas o serviço nunca vira primeiro plano (`startForegroundCount=0`) e a reprodução morre ao sair do app. Diagnosticado com `dumpsys activity services`
+  - O `seek` da restauração só pode ser aplicado em `STATE_READY`; aplicado antes, o ExoPlayer o descarta em silêncio (daí o `pendingSeekMs`). Reabrir o app **não** retoma a reprodução — só recompõe o estado, como o desktop
+  - A notificação usa uma capa gerada em tempo real a partir do gradiente da faixa (`GradientArtwork`, com cache LRU), espelhando o que o desktop entrega ao SMTC. A biblioteca não tem arte embutida porque nenhum dos dois lados lê tags
+  - Import por SAF guarda o **URI com permissão persistente** e toca dali: o arquivo do usuário nunca é copiado nem movido, como manda a regra do desktop
+  - ⚠️ **`stringResource` não funciona dentro do escopo de `LazyColumn`** (o bloco é `LazyListScope`, não `@Composable`). Os rótulos precisam ser içados para fora — pegou 5 telas de uma vez
+  - ⚠️ **Não usar here-string do PowerShell (`@'...'@`) em mensagem de commit com aspas internas**: o parser quebra e o git recebe os pedaços como pathspec. Escrever a mensagem num arquivo e usar `git commit -F`
+  - Ferramenta útil criada no scratchpad: `tap.ps1` toca em elementos pelo texto usando `uiautomator dump`, o que torna o E2E confiável mesmo na UI do sistema (seletor SAF)
+- ⏭️ Próximo passo: Fase 3 (paridade de telas: CRUD de playlists, ordenação, arrastar-e-soltar, menu de contexto)
