@@ -219,6 +219,13 @@
         <item quantity="other">Concluído! %1$d arquivos prontos para adicionar.</item>
     </plurals>
 
+    <string name="notif_channel_downloads">Downloads</string>
+    <string name="download_url_hint">Cole o link do YouTube</string>
+    <string name="download_queue">Fila de downloads</string>
+    <string name="download_engine_preparing">Preparando o mecanismo de download…</string>
+    <string name="download_done">Concluído</string>
+    <string name="download_failed">Falhou</string>
+
     <!-- Importação de playlist -->
     <string name="import_playlist">Importar Playlist</string>
     <string name="import_streaming_playlist">Importar playlist de streaming</string>

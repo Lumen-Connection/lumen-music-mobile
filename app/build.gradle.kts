@@ -113,6 +113,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
 
+    // Extração: NewPipe primeiro (leve), yt-dlp com Python embutido como
+    // fallback. Versões conhecidas-boas herdadas do lumen-stream-mobile v0.2.1.
+    implementation(libs.newpipe.extractor)
+    implementation(libs.youtubedl.library)
+    implementation(libs.youtubedl.ffmpeg)
+
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

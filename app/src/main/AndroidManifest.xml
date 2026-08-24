@@ -49,6 +49,12 @@
             </intent-filter>
         </service>
 
+        <!-- Mantém o processo vivo durante downloads longos (fase 4) -->
+        <service
+            android:name=".download.DownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
     </application>
 
 </manifest>
