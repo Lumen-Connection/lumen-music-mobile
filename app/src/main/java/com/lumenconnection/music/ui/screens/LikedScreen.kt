@@ -31,6 +31,8 @@ fun LikedScreen(nav: NavHostController) {
     val scope = rememberCoroutineScope()
     val dao = Graph.db.trackDao()
     val tracks by dao.observeLiked().collectAsStateWithLifecycle(emptyList())
+    // Fora do LazyColumn: o escopo dele não é @Composable.
+    val label = stringResource(R.string.nav_liked)
 
     Column(Modifier.fillMaxSize().background(colors.app)) {
         if (tracks.isEmpty()) {
@@ -44,26 +46,12 @@ fun LikedScreen(nav: NavHostController) {
         ) {
             item {
                 PageHeader(
-                    title = stringResource(R.string.nav_liked),
+                    title = label,
                     subtitle = pluralStringResource(R.plurals.track_count, tracks.size, tracks.size),
                 )
             }
             items(tracks, key = { it.id }) { track ->
-                TrackRow(
-                    title = track.title,
-                    artist = track.artist,
-                    durationMs = track.durationMs,
-                    color1 = track.coverColor1,
-                    color2 = track.coverColor2,
-                    liked = track.liked,
-                    onClick = {},
-                    onToggleLike = {
-                        scope.launch {
-                            dao.setLiked(track.id, !track.liked, System.currentTimeMillis())
-                        }
-                    },
-                    onMenu = {},
-                )
+                PlayableTrackRow(track, tracks, label)
             }
         }
     }

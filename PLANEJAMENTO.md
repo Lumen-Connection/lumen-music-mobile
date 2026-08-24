@@ -194,14 +194,14 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [x] 0.7 CI `.github/workflows/android.yml` do molde (build push/PR + release assinado em tag `v*`; lembrar `permissions: contents: write` e `tr -d '\r\n '` no keystore)
 
 ### Fase 1 — Dados + casca de navegação
-- [ ] 1.1 Room completo (schema da §3.1) + DAOs com Flows
-- [ ] 1.2 Testes de DAO (in-memory)
-- [ ] 1.3 Ports puros com testes unitários: `position_gap`, normalizador NFD de `textutils.h`, saudação de `greeting.h` (5 bandas × 3 variantes PT/EN)
-- [ ] 1.4 `AppNav`: bottom nav (Início/Buscar/Biblioteca) + drawer (Adicionar, Curtidas, Playlists, Sincronizar, Configurações) com logo e ordem espelhando a sidebar
-- [ ] 1.5 Todas as telas criadas com scaffold vazio + navegação com histórico/back
-- [ ] 1.6 `LumenComponents`: TrackRow (glyph play/coração/menu), PlaylistCard (gradiente + mosaico 2×2 + imagem), SectionHeader, EmptyState, Toast
-- [ ] 1.7 SettingsScreen: paleta, modo, densidade, reduce-motion, idioma — tudo ao vivo
-- [ ] 1.8 Commit + CI verde
+- [x] 1.1 Room completo (schema da §3.1) + DAOs com Flows
+- [x] 1.2 Testes de DAO (in-memory)
+- [x] 1.3 Ports puros com testes unitários: `position_gap`, normalizador NFD de `textutils.h`, saudação de `greeting.h` (5 bandas × 3 variantes PT/EN)
+- [x] 1.4 `AppNav`: bottom nav (Início/Buscar/Biblioteca) + drawer (Adicionar, Curtidas, Playlists, Sincronizar, Configurações) com logo e ordem espelhando a sidebar
+- [x] 1.5 Todas as telas criadas com scaffold vazio + navegação com histórico/back
+- [x] 1.6 `LumenComponents`: TrackRow (glyph play/coração/menu), PlaylistCard (gradiente + mosaico 2×2 + imagem), SectionHeader, EmptyState, Toast
+- [x] 1.7 SettingsScreen: paleta, modo, densidade, reduce-motion, idioma — tudo ao vivo
+- [x] 1.8 Commit + CI verde
 
 ### Fase 2 — Player MVP
 - [ ] 2.1 `PlaybackService : MediaSessionService` + ExoPlayer (foreground `mediaPlayback`)
@@ -326,4 +326,13 @@ Passos para este projeto:
   - Ícone gerado com PIL do `resources/icon.png` oficial (losango laranja com nota musical): adaptativo (`mipmap-anydpi-v26` + foreground 108dp com arte a 60%) e legado nas 5 densidades, mais `drawable-nodpi/logo_lumen_music.png` para o branding no drawer
   - Dependências de extração (NewPipe/youtubedl) ficaram **declaradas no catálogo mas fora do `app/build.gradle.kts`** até a fase 4: entram junto com o código que as usa, para não inflar o APK e o tempo de build desde já
   - ⚠️ `.gitignore` inicial tinha `/build` (só a raiz) e o `app/build/` entrou no primeiro `git add`; corrigido para `build/` antes do push
-- ⏭️ Próximo passo: Fase 1 (Room + casca de navegação)
+- ✅ **FASE 1 CONCLUÍDA** (2026-08-24). 24 testes unitários verdes, app validado rodando no emulador (AVD `lumen_test`, android-35 x86_64). Registros:
+  - Room com o schema espelhado + colunas de sync. Índices únicos em `remoteId`/`filePath` funcionam com nulos porque o SQLite trata NULLs como distintos num índice único — várias faixas locais convivem sem conflito
+  - `exportSchema = true` com `room.schemaLocation` configurado no KSP: os JSONs versionados são o que vai permitir migrações explícitas. **Nunca usar `fallbackToDestructiveMigration`** — a biblioteca tem faixas locais que nenhum sync recria
+  - Testes de DAO rodam na JVM via **Robolectric** (`@Config(sdk=[33])`), então entram no `gradlew test` e no CI, sem exigir emulador
+  - Os 6 modos de ordenação viraram 6 queries separadas no DAO: o Room exige SQL estático, então não dá para parametrizar o `ORDER BY`
+  - A grade de playlists monta os mosaicos 2×2 com **uma consulta só** (`observeAllCoverColors`), agrupada em Kotlin — uma query por card seria O(n) consultas na rolagem
+  - ⚠️ **Bug de layout achado só rodando, não compilando**: `fillMaxHeight()` nos itens da bottom nav fazia a barra reivindicar todo o espaço livre da Column e esmagar a área de conteúdo (a tela ficava vazia com a barra no meio). Trocado por altura fixa. Reforça a lição do projeto irmão: compilar não é rodar
+  - ⚠️ **Nunca editar fonte UTF-8 com `Get-Content`/`Set-Content` do PowerShell 5.1**: o round-trip leu o arquivo como ANSI e regravou como UTF-8, duplicando a codificação e destruindo todos os acentos do `Palettes.kt`. Usar a ferramenta de edição direta
+  - Acabamentos que só a captura de tela revelou: nome da paleta não estava traduzido (virou `labelRes` apontando para os recursos) e os ícones das barras de sistema não seguiam o tema do app (agora `WindowCompat` acompanha a luminância de `colors.app`)
+- ⏭️ Próximo passo: Fase 2 (player MVP com MediaSessionService)

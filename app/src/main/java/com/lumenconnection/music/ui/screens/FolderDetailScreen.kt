@@ -101,17 +101,7 @@ fun FolderDetailScreen(nav: NavHostController, folderId: Long) {
             item { EmptyState(stringResource(R.string.home_start_listening)) }
         } else {
             items(tracks, key = { it.id }) { track ->
-                TrackRow(
-                    title = track.title,
-                    artist = track.artist,
-                    durationMs = track.durationMs,
-                    color1 = track.coverColor1,
-                    color2 = track.coverColor2,
-                    liked = track.liked,
-                    onClick = {},
-                    onToggleLike = {},
-                    onMenu = {},
-                )
+                PlayableTrackRow(track, tracks, current.name)
             }
         }
     }

@@ -32,17 +32,24 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -57,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lumenconnection.music.Graph
 import com.lumenconnection.music.R
+import com.lumenconnection.music.player.PlayerController
 import com.lumenconnection.music.ui.screens.AddMusicScreen
 import com.lumenconnection.music.ui.screens.FolderDetailScreen
 import com.lumenconnection.music.ui.screens.HomeScreen
@@ -113,6 +121,11 @@ fun AppNav() {
     val nav = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var showNowPlaying by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val playbackError by PlayerController.playbackError.collectAsStateWithLifecycle()
 
     val backStackEntry by nav.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -160,8 +173,24 @@ fun AppNav() {
                 }
             }
 
+            PlayerBar(onExpand = { showNowPlaying = true })
             BottomBar(currentRoute = currentRoute, onNavigate = { navigateTop(nav, it) })
         }
+    }
+
+    if (showNowPlaying) {
+        NowPlayingSheet(onDismiss = { showNowPlaying = false })
+    }
+
+    // Arquivo ausente ou ilegível: o desktop mostra um toast em vez de silêncio.
+    playbackError?.let { title ->
+        LaunchedEffect(title) {
+            snackbarHostState.showSnackbar(context.getString(R.string.song_play_error) + " — " + title)
+            PlayerController.consumeError()
+        }
+    }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        SnackbarHost(snackbarHostState)
     }
 }
 

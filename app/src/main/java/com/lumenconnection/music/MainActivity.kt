@@ -1,10 +1,16 @@
 package com.lumenconnection.music
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.lumenconnection.music.player.PlayerController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,10 +28,34 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(LocaleOverride.wrap(newBase))
     }
 
+    private val notificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* opcional */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        requestNotificationPermissionIfNeeded()
         setContent { ThemedApp() }
+    }
+
+    /**
+     * A partir do Android 13 a notificação de mídia precisa de permissão. Sem
+     * ela a reprodução funciona, mas some da tela de bloqueio — daí o pedido no
+     * primeiro uso, sem bloquear nada se for negada.
+     */
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Grava a posição ao sair de vista; o autosave de 30 s cobre o resto,
+        // como o timer do desktop.
+        PlayerController.persistState()
     }
 }
 

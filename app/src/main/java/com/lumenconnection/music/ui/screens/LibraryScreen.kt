@@ -27,6 +27,8 @@ fun LibraryScreen(nav: NavHostController) {
     val colors = LumenTheme.colors
     val dimens = LumenTheme.dimens
     val tracks by Graph.db.trackDao().observeAll().collectAsStateWithLifecycle(emptyList())
+    // Fora do LazyColumn: o escopo dele não é @Composable.
+    val label = stringResource(R.string.home_full_library)
 
     Column(Modifier.fillMaxSize().background(colors.app)) {
         if (tracks.isEmpty()) {
@@ -43,24 +45,14 @@ fun LibraryScreen(nav: NavHostController) {
         ) {
             item {
                 PageHeader(
-                    title = stringResource(R.string.home_full_library),
+                    title = label,
                     subtitle = pluralStringResource(
                         R.plurals.track_count_in_library, tracks.size, tracks.size,
                     ),
                 )
             }
             items(tracks, key = { it.id }) { track ->
-                TrackRow(
-                    title = track.title,
-                    artist = track.artist,
-                    durationMs = track.durationMs,
-                    color1 = track.coverColor1,
-                    color2 = track.coverColor2,
-                    liked = track.liked,
-                    onClick = {},
-                    onToggleLike = {},
-                    onMenu = {},
-                )
+                PlayableTrackRow(track, tracks, label)
             }
         }
     }

@@ -67,6 +67,12 @@ fun HomeScreen(nav: NavHostController) {
     val variant = remember { Random.nextInt(1000) }
     val greeting = stringResource(Greeting.resFor(hour, variant))
 
+    // Os rótulos das prateleiras viram nome do contexto de reprodução. Ficam
+    // aqui porque o escopo do LazyColumn não é @Composable.
+    val playedLabel = stringResource(R.string.home_recently_played)
+    val addedLabel = stringResource(R.string.home_recently_added)
+    val playlistsLabel = stringResource(R.string.your_playlists_caps)
+
     if (total == 0) {
         Column(
             Modifier.fillMaxSize().background(colors.app),
@@ -99,7 +105,7 @@ fun HomeScreen(nav: NavHostController) {
 
         if (playlists.isNotEmpty()) {
             item {
-                SectionHeader(stringResource(R.string.your_playlists_caps))
+                SectionHeader(playlistsLabel)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(dimens.spacingSm)) {
                     items(playlists, key = { it.id }) { playlist ->
                         Column(
@@ -129,32 +135,19 @@ fun HomeScreen(nav: NavHostController) {
         }
 
         if (recentlyPlayed.isNotEmpty()) {
-            item { SectionHeader(stringResource(R.string.home_recently_played)) }
-            items(recentlyPlayed, key = { "played-${it.id}" }) { track -> HomeTrackRow(track) }
+            item { SectionHeader(playedLabel) }
+            items(recentlyPlayed, key = { "played-${it.id}" }) { track ->
+                PlayableTrackRow(track, recentlyPlayed, playedLabel)
+            }
         }
 
         if (recentlyAdded.isNotEmpty()) {
-            item { SectionHeader(stringResource(R.string.home_recently_added)) }
-            items(recentlyAdded, key = { "added-${it.id}" }) { track -> HomeTrackRow(track) }
+            item { SectionHeader(addedLabel) }
+            items(recentlyAdded, key = { "added-${it.id}" }) { track ->
+                PlayableTrackRow(track, recentlyAdded, addedLabel)
+            }
         }
     }
-}
-
-@Composable
-private fun HomeTrackRow(track: TrackEntity) {
-    // As ações reais (tocar, curtir, menu) são ligadas na fase 2, quando o
-    // PlayerController existir.
-    TrackRow(
-        title = track.title,
-        artist = track.artist,
-        durationMs = track.durationMs,
-        color1 = track.coverColor1,
-        color2 = track.coverColor2,
-        liked = track.liked,
-        onClick = {},
-        onToggleLike = {},
-        onMenu = {},
-    )
 }
 
 /** Faixa horizontal compacta usada na tira "Recentes". */

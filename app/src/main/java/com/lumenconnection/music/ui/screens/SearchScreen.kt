@@ -61,6 +61,12 @@ fun SearchScreen(nav: NavHostController) {
         if (normalized.isBlank()) flowOf(emptyList()) else db.playlistDao().search(normalized)
     }.collectAsStateWithLifecycle(emptyList())
 
+    // Fora do LazyColumn: o escopo dele não é @Composable.
+    val songsLabel = stringResource(R.string.songs)
+    val playlistsLabel = stringResource(R.string.nav_playlists)
+    val playlistTag = stringResource(R.string.playlist_caps)
+    val resultsLabel = stringResource(R.string.search_results_for, query)
+
     Column(Modifier.fillMaxSize().background(colors.app)) {
         Row(
             Modifier
@@ -98,7 +104,7 @@ fun SearchScreen(nav: NavHostController) {
                 verticalArrangement = Arrangement.spacedBy(dimens.spacingSm),
             ) {
                 if (playlists.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.nav_playlists)) }
+                    item { SectionHeader(playlistsLabel) }
                     items(playlists, key = { "pl-${it.id}" }) { playlist ->
                         Row(
                             Modifier
@@ -123,26 +129,16 @@ fun SearchScreen(nav: NavHostController) {
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
-                                Text(stringResource(R.string.playlist_caps), style = LumenText.micro)
+                                Text(playlistTag, style = LumenText.micro)
                             }
                         }
                     }
                 }
 
                 if (tracks.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.songs)) }
+                    item { SectionHeader(songsLabel) }
                     items(tracks, key = { "tr-${it.id}" }) { track ->
-                        TrackRow(
-                            title = track.title,
-                            artist = track.artist,
-                            durationMs = track.durationMs,
-                            color1 = track.coverColor1,
-                            color2 = track.coverColor2,
-                            liked = track.liked,
-                            onClick = {},
-                            onToggleLike = {},
-                            onMenu = {},
-                        )
+                        PlayableTrackRow(track, tracks, resultsLabel)
                     }
                 }
             }
