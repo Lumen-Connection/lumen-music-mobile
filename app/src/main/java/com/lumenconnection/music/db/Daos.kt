@@ -212,6 +212,10 @@ interface PlaylistTrackDao {
     @Query("SELECT trackId FROM playlist_tracks WHERE playlistId = :playlistId ORDER BY position")
     suspend fun orderedTrackIds(playlistId: Long): List<Long>
 
+    /** Ids com as posições reais — o cálculo do vão precisa dos valores gravados. */
+    @Query("SELECT trackId, position FROM playlist_tracks WHERE playlistId = :playlistId ORDER BY position")
+    suspend fun orderedPositions(playlistId: Long): List<TrackPosition>
+
     @Query("SELECT playlistId FROM playlist_tracks WHERE trackId = :trackId")
     suspend fun playlistsOf(trackId: Long): List<Long>
 
@@ -294,6 +298,8 @@ interface PlaylistTrackDao {
 }
 
 data class CoverPair(val coverColor1: String, val coverColor2: String)
+
+data class TrackPosition(val trackId: Long, val position: Long)
 
 @Dao
 interface PlaybackStateDao {

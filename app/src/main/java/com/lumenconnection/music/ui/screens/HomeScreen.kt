@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.lumenconnection.music.Graph
 import com.lumenconnection.music.R
 import com.lumenconnection.music.db.TrackEntity
+import com.lumenconnection.music.player.PlayerController
 import com.lumenconnection.music.ui.AccentButton
 import com.lumenconnection.music.ui.EmptyState
 import com.lumenconnection.music.ui.PlaylistCover
@@ -72,6 +73,7 @@ fun HomeScreen(nav: NavHostController) {
     val playedLabel = stringResource(R.string.home_recently_played)
     val addedLabel = stringResource(R.string.home_recently_added)
     val playlistsLabel = stringResource(R.string.your_playlists_caps)
+    val recentsLabel = stringResource(R.string.home_recents)
 
     if (total == 0) {
         Column(
@@ -127,6 +129,23 @@ fun HomeScreen(nav: NavHostController) {
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(top = dimens.spacingSm),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Tira "Recentes": atalhos compactos para o que acabou de tocar, como a
+        // faixa horizontal da HomePage do desktop.
+        if (recentlyPlayed.isNotEmpty()) {
+            item {
+                SectionHeader(recentsLabel)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(dimens.spacingSm)) {
+                    items(recentlyPlayed.take(6), key = { "chip-${it.id}" }) { track ->
+                        RecentChip(track) {
+                            PlayerController.playTrack(
+                                track, recentlyPlayed.map { it.id }, recentsLabel,
                             )
                         }
                     }
