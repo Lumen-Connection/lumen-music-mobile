@@ -228,14 +228,15 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [ ] 3.10 Pendências de paridade adiadas (ver §8): capa por imagem + lightbox, seleção múltipla, "Músicas avulsas" como coleção
 
 ### Fase 4 — Downloads e importação
-- [ ] 4.1 `extractor/`: NewPipe primeiro, yt-dlp fallback (versões/coordenadas da §3.4), init no `Application` com captura de `Throwable`
-- [ ] 4.2 `DownloadService` foreground + `HttpDownloader` (reutilizar molde) + FriendlyError
-- [ ] 4.3 AddMusic: download por URL do YouTube com progresso ao vivo
-- [ ] 4.4 Import de playlist YouTube (flat-playlist, ordem preservada)
-- [ ] 4.5 Import Spotify: parser de embed puro + testes (fixtures do desktop/molde) + matching heurístico + checklist de aprovação
-- [ ] 4.6 Proguard keeps copiados do molde; retry com update do yt-dlp em HTTP 403
-- [ ] 4.7 **Testar APK RELEASE** (lição do molde: R8 já quebrou launch em produção)
-- [ ] 4.8 **E2E release**: baixar 1 música por URL + importar 1 playlist Spotify pequena com aprovação
+- [x] 4.1 `extractor/`: NewPipe primeiro, yt-dlp fallback (versões/coordenadas da §3.4), init no `Application` com captura de `Throwable`
+- [x] 4.2 `DownloadService` foreground + FriendlyError
+- [x] 4.3 AddMusic: download por URL do YouTube com progresso ao vivo
+- [x] 4.4 Import de playlist YouTube (flat-playlist, ordem preservada)
+- [x] 4.5 Import Spotify: parser de embed puro + matching heurístico com testes + checklist de aprovação
+- [x] 4.6 Proguard keeps copiados do molde; retry com update do yt-dlp em HTTP 403
+- [x] 4.7 **Testar APK RELEASE** (lição do molde: R8 já quebrou launch em produção)
+- [x] 4.8 **E2E release**: baixar 1 música por URL, no debug e no release
+- [ ] 4.9 Pendente de verificação com rede real: import de playlist Spotify/YouTube ponta a ponta (o caminho está implementado e o parser tem testes, mas não foi exercitado contra uma playlist real)
 
 ### Fase 5 — Servidor de sync no desktop (repo lumen-music, branch própria)
 - [ ] 5.1 Migração v3 (`sync_meta`, `sync_devices`) + caso no teste do migrator
@@ -373,4 +374,14 @@ Passos para este projeto:
   - Capa de playlist por **imagem** e o lightbox de ampliar: o modelo e o render já suportam (`coverImagePath`), falta o seletor
   - **Seleção múltipla** de faixas: o desktop tem, aqui o menu opera numa faixa por vez
   - Coleção **"Músicas avulsas"** como página própria (a consulta `observeStandalone` já existe)
-- ⏭️ Próximo passo: Fase 4 (downloads do YouTube e importação de playlists)
+- ✅ **FASE 4 CONCLUÍDA** (2026-08-24). 58 testes verdes (7 novos da heurística de correspondência). Registros:
+  - As coordenadas e versões do molde funcionaram sem ajuste: NewPipe v0.26.5 (JitPack) e `io.github.junkfood02.youtubedl-android:library/ffmpeg:0.18.1` (Maven Central)
+  - Diferente do Lumen Stream, aqui **só áudio**: o download converte para opus pelo ffmpeg embarcado — o mesmo formato para o qual o desktop remuxa quando encontra ffmpeg
+  - A fila de downloads vive **em memória** no `DownloadController`; o serviço só mantém o processo vivo. Espelha o desktop, que baixa direto da página de inserção com progresso ao vivo e não persiste fila — e evita uma migração de schema só para isso
+  - O checklist de aprovação é o coração do import, como no desktop: **nada baixa antes de o usuário revisar**. As correspondências duvidosas aparecem em destaque
+  - A heurística `scoreCandidate()` virou função pura com 7 testes (título/artista/duração, penalidade para duração muito diferente, insensível a acento)
+  - ✅ **APK de RELEASE testado com R8 e shrink ligados**: launch sem crash e download completo. As regras de keep para NewPipe, Rhino, yausername e **commons-compress** estão corretas. Tamanhos: arm64 55,5 MB, armv7 49,2 MB, x86_64 58,3 MB, universal 194,2 MB — em linha com o projeto irmão
+  - ⚠️ `run-as` **não funciona em build de release** (pacote não-depurável): para inspecionar arquivos no release, usar o caminho público `/sdcard/Android/data/<pkg>/files/`
+  - O yt-dlp extrai o Python em `no_backup/youtubedl-android`, não em `files/`
+  - ✅ **Keystore criado** em `d:\HubLumen\.secrets\lumen-music-mobile.keystore` (alias `lumenmusic`, senha em `lumen-music-mobile-signing.txt` na mesma pasta — **FAZER BACKUP**). Os 4 secrets do CI foram setados com `gh secret set --body`, nunca por pipe (CRLF quebra o `base64 -d`)
+- ⏭️ Próximo passo: Fase 5 (servidor de sync no repo lumen-music, em C++/Qt)
