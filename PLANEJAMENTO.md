@@ -238,17 +238,18 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [x] 4.8 **E2E release**: baixar 1 música por URL, no debug e no release
 - [ ] 4.9 Pendente de verificação com rede real: import de playlist Spotify/YouTube ponta a ponta (o caminho está implementado e o parser tem testes, mas não foi exercitado contra uma playlist real)
 
-### Fase 5 — Servidor de sync no desktop (repo lumen-music, branch própria)
-- [ ] 5.1 Migração v3 (`sync_meta`, `sync_devices`) + caso no teste do migrator
-- [ ] 5.2 `http_server` + teste QTest (requests crus via `QTcpSocket`, incl. `Range`)
-- [ ] 5.3 `discovery_responder` UDP
-- [ ] 5.4 `pairing` (PIN/token/SHA-256/constant-time/5 tentativas) + teste
-- [ ] 5.5 `library_snapshot` + teste com DB in-memory
-- [ ] 5.6 `merge_service` (likes LWW, play counts delta, playlists por `clientKey`, transação) + teste de idempotência
-- [ ] 5.7 Streaming de arquivo com `Range` sem bloquear (dirigido por `bytesWritten`)
-- [ ] 5.8 `sync_server` em QThread + conexão SQL própria + `busy_timeout` + sinal `libraryChangedExternally()` ligado ao refresh das views
-- [ ] 5.9 `SyncDialog` (toggle, PIN, QR via qrcodegen vendorizado, devices + revogar) + entrada no menu/Settings
-- [ ] 5.10 **Verificação**: com o app aberto tocando música, `curl` completa pair→library→file(Range)→push sem travar a UI; likes do push aparecem na tela
+### Fase 5 — Servidor de sync no desktop (repo lumen-music, branch `feature/lan-sync`)
+- [x] 5.1 Migração v3 (`sync_meta`, `sync_devices`) + caso no teste do migrator
+- [x] 5.2 `http_server` + teste QTest (requests crus via `QTcpSocket`, incl. `Range`)
+- [x] 5.3 `discovery_responder` UDP
+- [x] 5.4 `pairing` (PIN/token/SHA-256/constant-time/5 tentativas) + teste
+- [x] 5.5 `library_snapshot` + teste com DB temporário
+- [x] 5.6 `merge_service` (likes LWW, play counts delta, playlists por `clientKey`, transação) + teste de idempotência
+- [x] 5.7 Streaming de arquivo com `Range` sem bloquear (dirigido por `bytesWritten`)
+- [x] 5.8 `sync_server` em QThread + conexão SQL própria + `busy_timeout` + sinal `libraryChangedExternally()` ligado ao refresh das views
+- [x] 5.9 `SyncDialog` (toggle, PIN, devices + revogar) + botão no rodapé da sidebar
+- [x] 5.10 **Verificação**: `test_sync_server` faz o E2E completo — parear, puxar biblioteca, baixar arquivo com `Range`, enviar push (com `libraryChangedExternally` disparando) e revogar
+- [ ] 5.11 QR no diálogo (adiado para a fase 7, junto com o leitor no celular)
 
 ### Fase 6 — Cliente de sync no mobile
 - [ ] 6.1 DTOs kotlinx-serialization + `SyncApi` (OkHttp, `X-Lumen-Token`)
@@ -384,4 +385,13 @@ Passos para este projeto:
   - ⚠️ `run-as` **não funciona em build de release** (pacote não-depurável): para inspecionar arquivos no release, usar o caminho público `/sdcard/Android/data/<pkg>/files/`
   - O yt-dlp extrai o Python em `no_backup/youtubedl-android`, não em `files/`
   - ✅ **Keystore criado** em `d:\HubLumen\.secrets\lumen-music-mobile.keystore` (alias `lumenmusic`, senha em `lumen-music-mobile-signing.txt` na mesma pasta — **FAZER BACKUP**). Os 4 secrets do CI foram setados com `gh secret set --body`, nunca por pipe (CRLF quebra o `base64 -d`)
-- ⏭️ Próximo passo: Fase 5 (servidor de sync no repo lumen-music, em C++/Qt)
+- ✅ **FASE 5 CONCLUÍDA** (2026-08-24). Repo **lumen-music**, branch `feature/lan-sync`, commit `fcb2d1d`. Suíte do desktop: **14/14 passando** (6 alvos novos). Registros:
+  - Ambiente de build do desktop nesta máquina: **VS 2022 Build Tools** (não o VS completo) em `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools`, com Ninja em `Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja` e Qt em `C:\Qt\6.10.2\msvc2022_64`. Um `.bat` que chama `vcvars64.bat` e põe o Ninja no PATH resolve; o aviso de `vswhere.exe` não encontrado é inofensivo
+  - Para rodar um teste fora do ctest é preciso pôr `C:\Qt\6.10.2\msvc2022_64\bin` no PATH (o ctest já injeta via `ENVIRONMENT`)
+  - ⚠️ **`QSqlDatabase` exige um `QCoreApplication`** para carregar o plugin QSQLITE. Testes de SQL com `QTEST_APPLESS_MAIN` morrem sem imprimir nada. O `test_migrator` já documentava isso — os testes novos passaram a usar `main()` explícito
+  - ⚠️ **`waitForReadyRead()` só atende o próprio socket**: num teste onde cliente e servidor vivem na mesma thread, isso mata o servidor de fome e toda requisição estoura o tempo. A solução é girar `QCoreApplication::processEvents()` no laço de espera
+  - `test_migrator` passou a comparar com `Migrator::kSchemaVersion` em vez do literal `2`, para não quebrar a cada nova migração
+  - `SyncServer::started` reporta a porta **efetivamente ligada** (`serverPort()`), o que permite passar 0 e deixar o SO escolher — é o que o teste E2E usa
+  - ✅ Migração v3 validada contra uma **cópia do banco real do usuário** (64 faixas, 4 playlists, 47 vínculos): sobe para `user_version = 3`, cria as tabelas, adiciona `origin_device` e passa no `foreign_key_check`, sem perder uma linha. O banco original não foi tocado
+  - Decisão registrada: a fila de PIN é **queimada no acerto e no esgotamento** (5 tentativas), o que fecha a força bruta sobre o espaço de 10⁶ na LAN
+- ⏭️ Próximo passo: Fase 6 (cliente de sync no mobile)
