@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Só as cores que o sistema precisa antes de o Compose pintar (fundo de janela e
+  ícone). A paleta real do app vive em ui/theme/Palettes.kt, portada do desktop.
+-->
+<resources>
+    <color name="ic_launcher_background">#0a0e12</color>
+    <!-- lumen dark: Colors.app -->
+    <color name="lumen_app_dark">#0a0e12</color>
+    <!-- lumen light: Colors.app -->
+    <color name="lumen_app_light">#f0f4f7</color>
+</resources>

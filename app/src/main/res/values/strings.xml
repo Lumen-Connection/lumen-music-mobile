@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Idioma-fonte: PT-BR, como no desktop (src/design/i18n.cpp usa as strings em
+  português como chave). A tradução para inglês fica em values-en/.
+
+  Melhoria sobre o desktop: lá a pluralização é `.arg(n != 1 ? "s" : "")`
+  hardcoded em 14 lugares (dívida técnica registrada no ContextV2.0.1.md).
+  Aqui usamos <plurals>, que é o mecanismo correto e funciona nos dois idiomas.
+-->
+<resources>
+    <string name="app_name">Lumen Music</string>
+
+    <!-- Ações genéricas -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_create">Criar</string>
+    <string name="action_remove">Remover</string>
+    <string name="action_import">Importar</string>
+    <string name="action_close">Fechar</string>
+    <string name="action_download">Baixar</string>
+    <string name="action_change">Alterar</string>
+    <string name="action_rename">Renomear</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_play">Tocar</string>
+    <string name="action_like">Curtir</string>
+    <string name="action_unlike">Descurtir</string>
+    <string name="action_clear">Limpar</string>
+    <string name="action_sort">Ordenar</string>
+    <string name="action_back">Voltar</string>
+
+    <!-- Navegação -->
+    <string name="nav_home">Início</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_library">Biblioteca</string>
+    <string name="nav_liked">Curtidas</string>
+    <string name="nav_playlists">Playlists</string>
+    <string name="nav_add_music">Adicionar músicas</string>
+    <string name="nav_sync">Sincronizar</string>
+    <string name="nav_settings">Configurações</string>
+    <string name="nav_queue">Fila</string>
+
+    <!-- Termos do domínio -->
+    <string name="unknown_artist">Desconhecido</string>
+    <string name="songs">Músicas</string>
+    <string name="artist">Artista</string>
+    <string name="title">Título</string>
+    <string name="duration">Duração</string>
+    <string name="playlist_caps">PLAYLIST</string>
+    <string name="collection_caps">COLEÇÃO</string>
+    <string name="standalone_songs">Músicas avulsas</string>
+    <string name="standalone_songs_caps">MÚSICAS AVULSAS</string>
+    <string name="your_playlists_caps">SUAS PLAYLISTS</string>
+
+    <plurals name="track_count">
+        <item quantity="one">%1$d faixa</item>
+        <item quantity="other">%1$d faixas</item>
+    </plurals>
+    <plurals name="track_count_in_library">
+        <item quantity="one">%1$d faixa na biblioteca</item>
+        <item quantity="other">%1$d faixas na biblioteca</item>
+    </plurals>
+    <plurals name="file_count_selected">
+        <item quantity="one">%1$d arquivo selecionado</item>
+        <item quantity="other">%1$d arquivos selecionados</item>
+    </plurals>
+    <plurals name="add_n_songs">
+        <item quantity="one">Adicionar %1$d música</item>
+        <item quantity="other">Adicionar %1$d músicas</item>
+    </plurals>
+
+    <!-- Início -->
+    <string name="home_prompt">O que você quer ouvir?</string>
+    <string name="home_recents">Recentes</string>
+    <string name="home_recently_played">Tocadas recentemente</string>
+    <string name="home_recently_added">Adicionadas recentemente</string>
+    <string name="home_full_library">Biblioteca Completa</string>
+    <string name="home_empty_title">Sua biblioteca está vazia</string>
+    <string name="home_empty_subtitle">Adicione seus arquivos de áudio para começar</string>
+    <string name="home_add_songs">Adicionar Músicas</string>
+    <string name="home_start_listening">Adicione músicas para começar a ouvir</string>
+    <string name="go_to_playlist">Ir para a playlist \"%1$s\"</string>
+
+    <!-- Saudações: 5 faixas horárias × 3 variantes, port de src/widgets/greeting.h -->
+    <string name="greeting_late_1">Boa madrugada! Insônia ou maratona musical?</string>
+    <string name="greeting_late_2">Madrugando, hein? A trilha sonora te acompanha.</string>
+    <string name="greeting_late_3">Boa madrugada. O volume baixo também vale.</string>
+    <string name="greeting_morning_1">Bom dia! Bora escolher a trilha do dia?</string>
+    <string name="greeting_morning_2">Bom dia. Café na mão, música no ar.</string>
+    <string name="greeting_morning_3">Bom dia! Que a primeira faixa dê o tom.</string>
+    <string name="greeting_afternoon_1">Boa tarde! Continua o som aí?</string>
+    <string name="greeting_afternoon_2">Boa tarde. Uma playlist pra acompanhar a tarde.</string>
+    <string name="greeting_afternoon_3">Boa tarde! Hora boa pra descobrir uma faixa nova.</string>
+    <string name="greeting_evening_1">Boa noite! Relaxa que a fila tá pronta.</string>
+    <string name="greeting_evening_2">Boa noite. Deixa o vinil girar.</string>
+    <string name="greeting_evening_3">Boa noite! Qual o clima de hoje?</string>
+    <string name="greeting_night_1">Já é quase madrugada, hein…</string>
+    <string name="greeting_night_2">Boa noite — ou já é quase madrugada?</string>
+    <string name="greeting_night_3">Tá tarde, mas a próxima faixa ainda cabe.</string>
+
+    <!-- Busca -->
+    <string name="search_hint">Buscar músicas, artistas e playlists</string>
+    <string name="search_empty_prompt">Digite algo na busca para encontrar músicas e playlists</string>
+    <string name="search_results_for">Resultados para “%1$s”</string>
+    <string name="search_no_results">Nenhum resultado para “%1$s”\nVerifique a escrita ou tente outras palavras</string>
+    <string name="search_playlists_hint">Buscar playlists</string>
+    <string name="search_in_playlist">Buscar na playlist</string>
+
+    <!-- Playlists -->
+    <string name="playlist_new">Nova Playlist</string>
+    <string name="playlist_none_yet">Nenhuma playlist ainda\nCrie uma playlist ou adicione músicas</string>
+    <string name="playlist_none">Nenhuma playlist</string>
+    <string name="playlist_name">Nome da playlist</string>
+    <string name="playlist_name_example">Ex: Minha Playlist</string>
+    <string name="playlist_cover_colors">Cores da capa:</string>
+    <string name="playlist_color_1">Cor 1</string>
+    <string name="playlist_color_2">Cor 2</string>
+    <string name="playlist_choose_image">Escolher imagem</string>
+    <string name="playlist_choose_cover_image">Escolher imagem da capa</string>
+    <string name="playlist_edit_cover">Editar capa</string>
+    <string name="playlist_edit_cover_title">Editar Capa</string>
+    <string name="playlist_rename_title">Renomear Playlist</string>
+    <string name="playlist_gradient_prompt">Escolha as cores do gradiente:</string>
+    <string name="playlist_back_to_gradient">Voltar a usar o gradiente de cores</string>
+    <string name="playlist_delete_title">Excluir Playlist</string>
+    <string name="playlist_delete_confirm">Excluir a playlist \"%1$s\"?</string>
+    <string name="playlist_delete_note">As músicas não serão apagadas — ficarão como músicas avulsas.</string>
+    <string name="playlist_edit">Editar playlist</string>
+    <string name="playlist_edit_title">Editar Playlist</string>
+    <string name="playlist_cover_image">Imagem da capa:</string>
+    <string name="playlist_view_image">Ver imagem</string>
+    <string name="playlist_add_to">Adicionar à playlist</string>
+    <string name="playlist_move_to">Mover para outra playlist</string>
+    <string name="playlist_remove_from">Remover da playlist</string>
+    <string name="playlist_none_available">Nenhuma playlist disponível</string>
+    <string name="playlist_no_playlist">Sem playlist</string>
+    <string name="playlist_new_ellipsis">Nova playlist...</string>
+    <string name="playlist_destination_caps">PLAYLIST DE DESTINO</string>
+    <string name="playlist_added_note_owner">«%1$s» foi adicionada a %2$s. O arquivo não foi duplicado — ele permanece na pasta de %3$s.</string>
+    <string name="playlist_added_note_general">«%1$s» foi adicionada a %2$s. O arquivo permanece na pasta geral do Lumen Music.</string>
+
+    <!-- Ordenação -->
+    <string name="sort_custom">Personalizada</string>
+    <string name="sort_title">Título</string>
+    <string name="sort_artist">Artista</string>
+    <string name="sort_recent">Mais recentes</string>
+    <string name="sort_oldest">Mais antigas</string>
+    <string name="sort_duration">Duração</string>
+    <string name="sort_alphabetical">Alfabética</string>
+    <string name="sort_and_view">Ordenar e exibir</string>
+    <string name="sort_by">Ordenar por</string>
+    <string name="view_as">Exibir como</string>
+    <string name="view_list">Lista</string>
+    <string name="view_grid">Grade</string>
+
+    <!-- Faixas -->
+    <string name="song_edit">Editar música</string>
+    <string name="song_edit_title">Editar Música</string>
+    <string name="song_name">Nome da música</string>
+    <string name="song_title_hint">Título da música</string>
+    <string name="song_artist_hint">Nome do artista</string>
+    <string name="song_delete">Excluir música</string>
+    <string name="song_delete_title">Excluir Música</string>
+    <string name="song_delete_confirm">Excluir \"%1$s\"?</string>
+    <string name="song_delete_note">A música será removida da biblioteca.</string>
+    <string name="song_play_error">Não foi possível reproduzir esta faixa</string>
+
+    <!-- Curtidas -->
+    <string name="liked_play">Tocar curtidas</string>
+    <string name="liked_empty">Nenhuma música curtida ainda</string>
+
+    <!-- Fila -->
+    <string name="queue_playback">Fila de reprodução</string>
+    <string name="queue_empty">A fila está vazia\nReproduza uma música ou adicione faixas à fila</string>
+    <string name="queue_now_playing_caps">TOCANDO AGORA</string>
+    <string name="queue_next_caps">PRÓXIMAS NA FILA</string>
+    <string name="queue_up_next_caps">A SEGUIR</string>
+    <string name="queue_up_next_named_caps">A SEGUIR — %1$s</string>
+    <string name="queue_add_to">Adicionar à fila</string>
+    <string name="queue_added">Adicionado à fila</string>
+    <string name="queue_remove_from">Remover da fila</string>
+    <string name="queue_clear_manual">Remover todas as músicas avulsas da fila</string>
+
+    <!-- Player -->
+    <string name="player_previous">Anterior</string>
+    <string name="player_next">Próxima</string>
+    <string name="player_play_pause">Play / Pause</string>
+    <string name="player_mute">Silenciar</string>
+    <string name="player_unmute">Ativar som</string>
+    <string name="player_shuffle">Aleatório</string>
+    <string name="player_repeat">Repetir</string>
+    <string name="player_repeat_all">Repetir todas</string>
+    <string name="player_repeat_one">Repetir uma</string>
+
+    <!-- Adicionar músicas -->
+    <string name="add_music_title">Inserção de Músicas</string>
+    <string name="add_music_drop_hint">Arraste seus arquivos de áudio ou clique para selecionar</string>
+    <string name="add_music_pick_hint">Clique ou arraste arquivos de áudio</string>
+    <string name="add_music_browse">Procurar Arquivos</string>
+    <string name="add_music_select">Selecionar Músicas</string>
+    <string name="add_music_add_to_library">Adicionar à Biblioteca</string>
+    <string name="add_music_save_to">Salvar em: </string>
+    <string name="add_music_choose_folder">Escolher pasta de downloads</string>
+    <string name="add_music_convert_playlist">Converter playlist de streaming</string>
+    <string name="add_music_convert_hint">Cole o link de uma playlist do Spotify ou do YouTube para trazê-la para o Lumen Music.</string>
+    <string name="add_music_convert_error">Use o link de uma playlist do Spotify (open.spotify.com/playlist/...) ou do YouTube (com \"list=\").</string>
+
+    <!-- Downloads -->
+    <string name="download_connecting">Conectando...</string>
+    <string name="download_progress">Baixando... %1$d%%</string>
+    <string name="download_downloading">Baixando...</string>
+    <string name="download_converting">Convertendo para Opus...</string>
+    <string name="download_updating_tool">Atualizando ferramenta de download…</string>
+    <string name="download_youtube_link_error">Use um link do YouTube (youtube.com ou youtu.be).</string>
+    <string name="download_check_link">Verifique o link ou tente novamente.</string>
+    <string name="download_error_prefix">Erro: </string>
+    <string name="download_no_audio_found">Download concluído, mas nenhum arquivo de áudio encontrado.</string>
+    <plurals name="download_done_files">
+        <item quantity="one">Concluído! %1$d arquivo pronto para adicionar.</item>
+        <item quantity="other">Concluído! %1$d arquivos prontos para adicionar.</item>
+    </plurals>
+
+    <!-- Importação de playlist -->
+    <string name="import_playlist">Importar Playlist</string>
+    <string name="import_streaming_playlist">Importar playlist de streaming</string>
+    <string name="import_fetching">Buscando informações da playlist...</string>
+    <string name="import_name_in_lumen">Nome da playlist no Lumen Music</string>
+    <string name="import_spotify_unreachable">Não foi possível acessar o Spotify: </string>
+    <string name="import_spotify_private">Não foi possível ler a playlist do Spotify. Playlists privadas não podem ser importadas — torne a playlist pública e tente novamente.</string>
+    <string name="import_youtube_error">Não foi possível listar a playlist do YouTube. Verifique o link.</string>
+    <string name="import_youtube_private">Esta playlist do YouTube é privada e não pode ser importada. Torne-a pública ou não listada e tente novamente.</string>
+    <string name="import_imported_playlist">Playlist importada</string>
+    <string name="import_no_songs">Nenhuma música encontrada nessa playlist.</string>
+    <string name="import_matching">Buscando correspondências no YouTube... (%1$d de %2$d)</string>
+    <plurals name="import_review">
+        <item quantity="one">Revise a lista: %1$d música em laranja pode estar errada. Marque para aprovar e desmarque para reprovar.</item>
+        <item quantity="other">Revise a lista: %1$d músicas em laranja podem estar erradas. Marque para aprovar e desmarque para reprovar.</item>
+    </plurals>
+    <string name="import_all_set">Tudo pronto. Desmarque alguma música para não importá-la.</string>
+    <string name="import_no_match">Nenhuma correspondência encontrada</string>
+    <string name="import_none_selected">Nenhuma música selecionada para importar.</string>
+    <string name="import_downloading_n">Baixando %1$d de %2$d: %3$s</string>
+    <plurals name="import_done">
+        <item quantity="one">Concluído! %1$d de %2$d música importada para \"%3$s\".</item>
+        <item quantity="other">Concluído! %1$d de %2$d músicas importadas para \"%3$s\".</item>
+    </plurals>
+
+    <!-- Configurações / aparência -->
+    <string name="settings_appearance">Aparência</string>
+    <string name="settings_palette">Paleta de Cores</string>
+    <string name="settings_theme">Escolher Tema</string>
+    <string name="settings_mode">Modo</string>
+    <string name="mode_system">Sistema</string>
+    <string name="mode_dark">Escuro</string>
+    <string name="mode_light">Claro</string>
+    <string name="mode_high_contrast">Alto contraste</string>
+    <string name="settings_density">Densidade</string>
+    <string name="density_comfortable">Confortável</string>
+    <string name="density_compact">Compacta</string>
+    <string name="settings_reduce_motion">Reduzir movimento</string>
+    <string name="settings_reduce_motion_hint">Desliga o giro do vinil e as transições animadas</string>
+    <string name="settings_language">Idioma</string>
+    <string name="language_system">Sistema</string>
+
+    <!-- Nomes das paletas (iguais aos do desktop) -->
+    <string name="palette_lumen">Lumen</string>
+    <string name="palette_warm">Vinil Quente</string>
+    <string name="palette_ocean">Oceano</string>
+    <string name="palette_forest">Floresta</string>
+    <string name="palette_purple">Roxo Noturno</string>
+    <string name="palette_gray">Cinza Moderno</string>
+
+    <!-- Sincronização com o desktop (recurso novo, não existe no desktop hoje) -->
+    <string name="sync_title">Sincronizar com o PC</string>
+    <string name="sync_searching">Procurando o Lumen Music na rede…</string>
+    <string name="sync_no_servers">Nenhum PC encontrado. Abra o Lumen Music no computador e ligue a sincronização.</string>
+    <string name="sync_manual_address">Informar endereço manualmente</string>
+    <string name="sync_host_hint">IP do computador</string>
+    <string name="sync_port_hint">Porta</string>
+    <string name="sync_pin_prompt">Digite o PIN mostrado no computador</string>
+    <string name="sync_pair">Parear</string>
+    <string name="sync_pair_failed">PIN incorreto ou expirado.</string>
+    <string name="sync_paired_with">Pareado com %1$s</string>
+    <string name="sync_unpair">Desfazer pareamento</string>
+    <string name="sync_now">Sincronizar agora</string>
+    <string name="sync_never">Nunca sincronizado</string>
+    <string name="sync_last_at">Última sincronização: %1$s</string>
+    <string name="sync_in_progress">Sincronizando…</string>
+    <string name="sync_downloading_files">Baixando faixas (%1$d de %2$d)</string>
+    <string name="sync_done">Sincronização concluída</string>
+    <string name="sync_failed">Falha na sincronização: %1$s</string>
+    <string name="sync_revoked">O computador revogou este aparelho. Pareie novamente.</string>
+    <string name="sync_proto_mismatch">Versões incompatíveis. Atualize o Lumen Music no computador.</string>
+    <string name="sync_offline_hint">Conecte-se à mesma rede Wi-Fi do computador.</string>
+    <string name="sync_audio_selection">Baixar áudio destas playlists</string>
+    <string name="sync_all_playlists">Todas as playlists</string>
+    <string name="sync_metadata_note">Os metadados da biblioteca inteira são sempre sincronizados; o áudio só das playlists escolhidas.</string>
+</resources>

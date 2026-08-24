@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Tema só da janela: a aparência real é decidida pelo Compose (LumenTheme). O
+  windowBackground usa a cor `app` da paleta Lumen para não haver flash branco
+  entre o splash e o primeiro frame.
+-->
+<resources>
+    <style name="Theme.LumenMusic" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/lumen_app_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

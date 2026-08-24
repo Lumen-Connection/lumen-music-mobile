@@ -1,0 +1,8 @@
+# O repo é escrito no Windows mas o CI roda em Linux: o wrapper precisa de LF
+# ou o runner falha com "bad interpreter".
+* text=auto eol=lf
+gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
+*.keystore binary
