@@ -2,6 +2,7 @@ package com.lumenconnection.music.ui.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.lumenconnection.music.R
 
 /**
  * Port 1:1 de `src/design/tokens.h` (struct Colors) e `src/design/palettes.cpp`
@@ -35,7 +36,8 @@ enum class LumenDensity { Comfortable, Compact }
 @Immutable
 data class PaletteDef(
     val id: String,
-    val label: String,
+    /** Nome traduzido; o desktop também traduz ("Oceano" → "Ocean") pelo i18n.cpp. */
+    val labelRes: Int,
     val dark: LumenColors,
     val light: LumenColors,
 )
@@ -104,7 +106,7 @@ private fun makeLight(
  */
 val AllPalettes: List<PaletteDef> = listOf(
     PaletteDef(
-        id = "lumen", label = "Lumen",
+        id = "lumen", labelRes = R.string.palette_lumen,
         dark = makeDark(
             0x0a0e12, 0x070a0d, 0x121821, 0x1c2530, 0x161d27,
             0xeef3f6, 0x93a1ad, 0x5a6670, 0x263240,
@@ -118,7 +120,7 @@ val AllPalettes: List<PaletteDef> = listOf(
         ),
     ),
     PaletteDef(
-        id = "warm", label = "Vinil Quente",
+        id = "warm", labelRes = R.string.palette_warm,
         dark = makeDark(
             0x1a1712, 0x14110e, 0x2a2620, 0x342f28, 0x221f19,
             0xf0ece4, 0xb8b0a2, 0x7a7266, 0x3a352d,
@@ -131,7 +133,7 @@ val AllPalettes: List<PaletteDef> = listOf(
         ),
     ),
     PaletteDef(
-        id = "ocean", label = "Oceano",
+        id = "ocean", labelRes = R.string.palette_ocean,
         dark = makeDark(
             0x0d1520, 0x0a1018, 0x162338, 0x1d2e47, 0x111c2d,
             0xe4f0f8, 0xa0c0d8, 0x5a7a90, 0x1e3048,
@@ -144,7 +146,7 @@ val AllPalettes: List<PaletteDef> = listOf(
         ),
     ),
     PaletteDef(
-        id = "forest", label = "Floresta",
+        id = "forest", labelRes = R.string.palette_forest,
         dark = makeDark(
             0x121a12, 0x0e140e, 0x1f281f, 0x283328, 0x182018,
             0xe8f0e8, 0xa8c0a8, 0x6a8a6a, 0x2a3a2a,
@@ -157,7 +159,7 @@ val AllPalettes: List<PaletteDef> = listOf(
         ),
     ),
     PaletteDef(
-        id = "purple", label = "Roxo Noturno",
+        id = "purple", labelRes = R.string.palette_purple,
         dark = makeDark(
             0x15101a, 0x100c14, 0x261c30, 0x30233c, 0x1d1525,
             0xf0e8f8, 0xc0a8d8, 0x7a6090, 0x352545,
@@ -170,7 +172,7 @@ val AllPalettes: List<PaletteDef> = listOf(
         ),
     ),
     PaletteDef(
-        id = "gray", label = "Cinza Moderno",
+        id = "gray", labelRes = R.string.palette_gray,
         dark = makeDark(
             0x141414, 0x0e0e0e, 0x242424, 0x2e2e2e, 0x1c1c1c,
             0xf5f5f5, 0xbdbdbd, 0x757575, 0x333333,

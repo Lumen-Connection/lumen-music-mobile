@@ -1,13 +1,17 @@
 package com.lumenconnection.music.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
+import androidx.core.view.WindowCompat
 
 /**
  * Tema do Lumen Music Mobile. Os tokens vêm do port do design system do desktop
@@ -108,6 +112,20 @@ fun LumenTheme(
     val effectiveMode = mode ?: if (systemDark) LumenMode.Dark else LumenMode.Light
     val tokens = buildTokens(paletteId, effectiveMode, density, hcFromLight)
         .let { it.copy(motion = it.motion.copy(reduced = reduceMotion)) }
+
+    // Os ícones das barras de sistema seguem o tema escolhido no app, não o do
+    // aparelho: com tema claro sobre sistema escuro eles sumiriam no fundo.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        val lightSurface = relativeLuminance(tokens.color.app) > 0.5
+        SideEffect {
+            val window = (view.context as? Activity)?.window ?: return@SideEffect
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = lightSurface
+                isAppearanceLightNavigationBars = lightSurface
+            }
+        }
+    }
 
     CompositionLocalProvider(LocalLumenTokens provides tokens) {
         MaterialTheme(

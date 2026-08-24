@@ -185,13 +185,13 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 ## 4. Fases e checklist
 
 ### Fase 0 — Bootstrap (repo mobile)
-- [ ] 0.1 Verificar toolchain (seção 6) — já instalado para o lumen-stream-mobile; criar `local.properties`
-- [ ] 0.2 Scaffold Gradle a partir do molde: version catalog, AGP/Kotlin/KSP, minSdk 26/target 35, desugaring, ABI splits, `MainActivity` + Compose "Hello"
-- [ ] 0.3 Port do design system: `theme/` com as 6 paletas dark+light+HC derivado, densidades, reduce-motion (hex de `palettes.cpp`)
-- [ ] 0.4 i18n: `values/strings.xml` (PT-BR) + `values-en/` com o dicionário portado
-- [ ] 0.5 `Graph.kt` + `config/SettingsRepository` (tema/idioma funcionando ao vivo)
-- [ ] 0.6 Ícone do app (logo oficial do lumen-music) + `git init` + repo `Lumen-Connection/lumen-music-mobile` via `gh` + push
-- [ ] 0.7 CI `.github/workflows/android.yml` do molde (build push/PR + release assinado em tag `v*`; lembrar `permissions: contents: write` e `tr -d '\r\n '` no keystore)
+- [x] 0.1 Verificar toolchain (seção 6) — já instalado para o lumen-stream-mobile; criar `local.properties`
+- [x] 0.2 Scaffold Gradle a partir do molde: version catalog, AGP/Kotlin/KSP, minSdk 26/target 35, desugaring, ABI splits, `MainActivity` + Compose "Hello"
+- [x] 0.3 Port do design system: `theme/` com as 6 paletas dark+light+HC derivado, densidades, reduce-motion (hex de `palettes.cpp`)
+- [x] 0.4 i18n: `values/strings.xml` (PT-BR) + `values-en/` com o dicionário portado
+- [x] 0.5 `Graph.kt` + `config/SettingsRepository` (tema/idioma funcionando ao vivo)
+- [x] 0.6 Ícone do app (logo oficial do lumen-music) + `git init` + repo `Lumen-Connection/lumen-music-mobile` via `gh` + push
+- [x] 0.7 CI `.github/workflows/android.yml` do molde (build push/PR + release assinado em tag `v*`; lembrar `permissions: contents: write` e `tr -d '\r\n '` no keystore)
 
 ### Fase 1 — Dados + casca de navegação
 - [ ] 1.1 Room completo (schema da §3.1) + DAOs com Flows
@@ -318,5 +318,12 @@ Passos para este projeto:
 - ✅ Entrevistas concluídas e decisões registradas (seção 2)
 - ✅ Protocolo de sync desenhado e fatos verificados: kit Qt sem QHttpServer (→ servidor próprio sobre QTcpServer); ids do desktop são AUTOINCREMENT estáveis (→ `remoteId` simples no mobile)
 - ✅ Plano aprovado pelo usuário
-- ⏭️ Nada implementado ainda — próximo passo: Fase 0 (bootstrap do repo mobile)
 - ⚠️ Preferência do usuário registrada no projeto irmão: commits **sem** trailer de co-autoria do Claude
+- ✅ **FASE 0 CONCLUÍDA** (2026-08-24). Repo criado e publicado: https://github.com/Lumen-Connection/lumen-music-mobile (50 arquivos, branch main). `gradlew assembleDebug` **verde de primeira**. Detalhes que valem registrar:
+  - Design system portado 1:1 em `ui/theme/`: `Contrast.kt` (luminância relativa, `contrastRatio`, `ensureContrast` com a mesma mistura 2:1 e limite de 12 iterações, `pickOnAccent` no corte 0.55, e um `darker()` equivalente ao `QColor::darker` em HSV — o desktop usa 115 no escuro e 112 no claro para o `accentDim`), `Palettes.kt` (as 6 paletas com os hex idênticos), `Tokens.kt` (métricas/tipografia por densidade + `deriveHighContrast`), `LumenTheme.kt` (CompositionLocals + esquema M3 derivado)
+  - Modo `System` adicionado ao tema: não existe no desktop (lá é Dark/Light/HC explícito), mas seguir o aparelho é o padrão esperado no Android. `hcFromLight` é persistido para o HC derivar da base certa, como o parâmetro do `buildTokens` do desktop
+  - Idioma: PT-BR é a fonte (`values/`), EN em `values-en/`, com o dicionário do `i18n.cpp` portado. Pluralização virou `<plurals>` — melhor que o `.arg(n != 1 ? "s" : "")` que o desktop registra como dívida técnica. Troca de idioma usa `Activity.recreate()` (equivalente Android do retranslate ao vivo) e o valor é espelhado num SharedPreferences porque `attachBaseContext` precisa lê-lo de forma síncrona, antes do DataStore
+  - Ícone gerado com PIL do `resources/icon.png` oficial (losango laranja com nota musical): adaptativo (`mipmap-anydpi-v26` + foreground 108dp com arte a 60%) e legado nas 5 densidades, mais `drawable-nodpi/logo_lumen_music.png` para o branding no drawer
+  - Dependências de extração (NewPipe/youtubedl) ficaram **declaradas no catálogo mas fora do `app/build.gradle.kts`** até a fase 4: entram junto com o código que as usa, para não inflar o APK e o tempo de build desde já
+  - ⚠️ `.gitignore` inicial tinha `/build` (só a raiz) e o `app/build/` entrou no primeiro `git add`; corrigido para `build/` antes do push
+- ⏭️ Próximo passo: Fase 1 (Room + casca de navegação)

@@ -2,6 +2,7 @@ package com.lumenconnection.music
 
 import android.content.Context
 import com.lumenconnection.music.config.SettingsRepository
+import com.lumenconnection.music.db.AppDatabase
 
 /**
  * Service locator do app — mesma escolha do lumen-stream-mobile: sem framework de
@@ -14,6 +15,9 @@ object Graph {
     lateinit var settings: SettingsRepository
         private set
 
+    lateinit var db: AppDatabase
+        private set
+
     @Volatile
     private var initialized = false
 
@@ -21,6 +25,7 @@ object Graph {
         if (initialized) return
         val app = context.applicationContext
         settings = SettingsRepository(app)
+        db = AppDatabase.build(app)
         initialized = true
     }
 }

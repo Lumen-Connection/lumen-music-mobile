@@ -74,6 +74,13 @@ android {
     }
 }
 
+// Schemas versionados do Room: são o que permite escrever migrações explícitas
+// quando o banco evoluir (nunca fallbackToDestructiveMigration — a biblioteca
+// tem faixas locais que nenhum sync recria).
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
