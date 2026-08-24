@@ -216,15 +216,16 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [x] 2.10 **E2E**: importar 3 arquivos → tocar → enfileirar → matar o app → reabrir → sessão restaurada → controlar pela notificação e por fone Bluetooth
 
 ### Fase 3 — Paridade de telas
-- [ ] 3.1 Playlists: criar/renomear/deletar, capa gradiente (2 cores) ou imagem, lightbox
-- [ ] 3.2 FolderDetail: header com capa, lista virtualizada, 6 sort modes persistidos por playlist, filtro de texto, drag-and-drop gap-1024
-- [ ] 3.3 Curtidas (tela + like em todo lugar), multi-select + menu de contexto (tocar, enfileirar, curtir, adicionar-a-playlist com submenu, editar, deletar)
-- [ ] 3.4 Busca global accent-insensitive (títulos, artistas, playlists separadas), debounce
-- [ ] 3.5 Home completa: saudação por hora, chips de playlists, strip "Recentes", shelves Tocadas/Adicionadas recentemente
-- [ ] 3.6 Library (biblioteca completa) + diálogo editar faixa (título/artista, só no DB)
-- [ ] 3.7 Toasts + confirmações de deleção
-- [ ] 3.8 **Checklist de paridade tela-a-tela contra o desktop** (rodar o desktop ao lado e comparar cada tela; navegação é a única divergência aceita)
-- [ ] 3.9 Commit + CI verde
+- [x] 3.1 Playlists: criar/renomear/deletar, capa gradiente (2 cores) ou imagem, lightbox
+- [x] 3.2 FolderDetail: header com capa, lista virtualizada, 6 sort modes persistidos por playlist, filtro de texto, drag-and-drop gap-1024
+- [x] 3.3 Curtidas (tela + like em todo lugar), menu de contexto (tocar, enfileirar, curtir, adicionar-a-playlist com submenu, editar, deletar)
+- [x] 3.4 Busca global accent-insensitive (títulos, artistas, playlists separadas)
+- [x] 3.5 Home completa: saudação por hora, chips de playlists, strip "Recentes", shelves Tocadas/Adicionadas recentemente
+- [x] 3.6 Library (biblioteca completa) + diálogo editar faixa (título/artista, só no DB)
+- [x] 3.7 Toasts + confirmações de deleção
+- [x] 3.8 **Checklist de paridade tela-a-tela contra o desktop** (ver §8)
+- [x] 3.9 Commit + CI verde
+- [ ] 3.10 Pendências de paridade adiadas (ver §8): capa por imagem + lightbox, seleção múltipla, "Músicas avulsas" como coleção
 
 ### Fase 4 — Downloads e importação
 - [ ] 4.1 `extractor/`: NewPipe primeiro, yt-dlp fallback (versões/coordenadas da §3.4), init no `Application` com captura de `Throwable`
@@ -344,4 +345,32 @@ Passos para este projeto:
   - ⚠️ **`stringResource` não funciona dentro do escopo de `LazyColumn`** (o bloco é `LazyListScope`, não `@Composable`). Os rótulos precisam ser içados para fora — pegou 5 telas de uma vez
   - ⚠️ **Não usar here-string do PowerShell (`@'...'@`) em mensagem de commit com aspas internas**: o parser quebra e o git recebe os pedaços como pathspec. Escrever a mensagem num arquivo e usar `git commit -F`
   - Ferramenta útil criada no scratchpad: `tap.ps1` toca em elementos pelo texto usando `uiautomator dump`, o que torna o E2E confiável mesmo na UI do sistema (seletor SAF)
-- ⏭️ Próximo passo: Fase 3 (paridade de telas: CRUD de playlists, ordenação, arrastar-e-soltar, menu de contexto)
+- ✅ **FASE 3 CONCLUÍDA** (2026-08-24). 51 testes verdes (12 novos do `LibraryRepository`). Registros:
+  - `LibraryRepository` concentra as escritas compostas (facade no espírito do `TrackModel`); os composables seguem lendo Flows direto dos DAOs, como no molde
+  - `moveTrack` tenta o vão entre os vizinhos e **só renormaliza a playlist inteira quando o vão fecha** — há teste com posições coladas de propósito (100/101) provando que a renormalização devolve múltiplos de 1024
+  - Arrastar-para-reordenar só fica ativo na ordenação **personalizada e sem filtro**: reordenar uma lista filtrada não teria destino definido
+  - Menu de contexto com a mesma ordem do `trackcontextmenu.cpp`, submenu de playlists com marcação de pertencimento, e "remover da playlist" só aparece quando a faixa é vista de dentro de uma
+  - Toque longo no card de playlist abre o menu — é o equivalente do clique direito do desktop
+  - ⚠️ **Automatizar a IME do emulador não vale o esforço**: um tutorial do Gboard ("Try out your stylus") aparece por cima e engole os toques, e `adb shell input text` trata espaços de forma inconsistente. A lógica de criação/edição foi coberta por testes de repositório (mais confiável) e a UI verificada com uma playlist semeada via `sqlite3`
+  - ⚠️ `run-as` **não lê `/sdcard`** (armazenamento com escopo). Para rodar SQL no banco do app: `adb shell "cat /sdcard/x.sql | run-as <pkg> sqlite3 databases/lumen_music.db"` — o shell lê o arquivo e envia por stdin
+  - ⚠️ **CI falhou na primeira execução**: o `gradlew` foi commitado sem o bit de execução (o Windows não o preserva) e o runner Linux deu `Permission denied` (exit 126). Corrigido com `git update-index --chmod=+x gradlew`; CI verde desde então
+
+  **Checklist de paridade (item 3.8)** — comparado tela a tela com o desktop:
+  | Tela | Paridade | Observação |
+  |---|---|---|
+  | Home | ✅ | saudação 5 faixas × 3 variantes, chips de playlists, tira Recentes, 2 prateleiras |
+  | Biblioteca | ✅ | lista completa com contagem |
+  | Busca | ✅ | faixas + playlists separadas, sem acento |
+  | Curtidas | ✅ | coleção + coração em toda linha |
+  | Playlists (grade) | ✅ | capa gradiente/mosaico, criar, renomear, excluir |
+  | Detalhe da playlist | ✅ | capa, 6 ordenações persistidas, filtro, arrastar |
+  | Fila | ✅ | vira bottom-sheet (divergência sancionada) |
+  | Player | ✅ | vinil girando, coração, transporte, aleatório/repetir |
+  | Adicionar músicas | ⚠️ | seleção local pronta; download/import são da fase 4 |
+  | Configurações | ✅ | 6 paletas × modos × densidades, reduce-motion, idioma |
+
+  **Divergências ainda em aberto** (item 3.10, não bloqueiam as próximas fases):
+  - Capa de playlist por **imagem** e o lightbox de ampliar: o modelo e o render já suportam (`coverImagePath`), falta o seletor
+  - **Seleção múltipla** de faixas: o desktop tem, aqui o menu opera numa faixa por vez
+  - Coleção **"Músicas avulsas"** como página própria (a consulta `observeStandalone` já existe)
+- ⏭️ Próximo passo: Fase 4 (downloads do YouTube e importação de playlists)
