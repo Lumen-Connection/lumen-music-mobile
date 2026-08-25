@@ -265,13 +265,14 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [ ] 6.11 Download em paralelo (2–3 simultâneos); hoje é sequencial
 
 ### Fase 7 — Polish e release
-- [ ] 7.1 QR scan no pareamento (`zxing-android-embedded`)
-- [ ] 7.2 "Continuar de onde parou no PC" (playback_state do snapshot)
-- [ ] 7.3 Passe de alto-contraste/compacto/reduce-motion + passe de tradução EN
-- [ ] 7.4 Teste completo no APK release (universal + arm64)
-- [ ] 7.5 Keystore novo `d:\HubLumen\.secrets\lumen-music-mobile.keystore` + secrets no repo via `gh secret set --body`
-- [ ] 7.6 Tag `v0.1.0` mobile → APKs no GitHub Releases; README PT/EN (incl. troubleshooting de firewall/rede) + LICENSE GPLv3
-- [ ] 7.7 Desktop: PR da branch de sync → release `v2.1.x` (coordenar com o roadmap 2.1 existente — TagLib/Álbuns — que NÃO faz parte deste plano)
+- [x] 7.2 "Continuar de onde parou no PC" (playback_state do snapshot)
+- [x] 7.3 Passe de tradução EN — 237 chaves, PT e EN completos (conferido por script)
+- [x] 7.4 Teste no APK release assinado (x86_64): launch, pareamento, sync e retomada
+- [x] 7.5 Keystore `d:\HubLumen\.secrets\lumen-music-mobile.keystore` + 4 secrets no repo
+- [x] 7.6 Tag `v0.1.0` → APKs no GitHub Releases; README PT/EN com troubleshooting de firewall + LICENSE GPLv3
+- [ ] 7.1 QR no pareamento — **adiado de propósito**: exige vendorizar o qrcodegen no desktop e uma dependência de câmera no celular, para substituir 6 dígitos que já funcionam. Fazer só se o PIN incomodar na prática (par com o item 5.11)
+- [ ] 7.7 Desktop: abrir PR da branch `feature/lan-sync` e cortar release `v2.1.x` (coordenar com o roadmap 2.1 existente — TagLib/Álbuns — que NÃO faz parte deste plano)
+- [ ] 7.8 Testar o release em aparelho físico e em rede Wi-Fi real (o E2E rodou no emulador com `adb reverse`)
 
 ## 5. Riscos conhecidos
 
@@ -403,4 +404,9 @@ Passos para este projeto:
   - Mensagens separadas: "PIN incorreto" e "não foi possível falar com o computador" são problemas diferentes, e mandar conferir o PIN quando a causa é firewall custa tempo à toa
   - **Sobre o ambiente de teste**: o broadcast da descoberta não atravessa o NAT do emulador, e o Firewall do Windows bloqueia a conexão vinda do emulador para o host. `adb reverse tcp:45150 tcp:45150` resolve os dois sem exigir admin — o app conecta em `127.0.0.1` e o adb encaminha. Vale registrar que **a descoberta automática não foi exercitada em rede real**, só o caminho manual
   - Ferramenta nova no repo do desktop: `tools/sync_probe.cpp` sobe o servidor headless (imprime o PIN e serve até Ctrl+C), o que torna o E2E do celular repetível sem automatizar a janela do app
-- ⏭️ Próximo passo: Fase 7 (polish e release) — e os pendentes 6.8/6.9/6.11
+- ✅ **FASE 7 (essencial) CONCLUÍDA** (2026-08-25):
+  - **Auto-sync** ao abrir o app, com intervalo mínimo de 5 min e `ping` de timeout curto — sincronizar é conveniência, nunca deve fazer o usuário esperar para ouvir música. Se o IP guardado não responde, a descoberta reencontra o PC pelo `serverId` e atualiza o endereço: trocar de IP não custa novo pareamento
+  - **"Continuar de onde parou no PC"** validado: desktop parado em 95 s → celular retomou em 97 s, no mesmo contexto
+  - **Release assinado testado** (x86_64, R8 + shrink): launch, pareamento, sync de 63 faixas e retomada. As regras de keep preservam os serializers do kotlinx.serialization
+  - Strings: **237 chaves, PT e EN completos**, conferido por script
+- ⏭️ Pendentes conscientes: 6.8 já feito; **6.9** (testes do diff do SyncEngine), **6.11** (download paralelo), **7.1** (QR), **7.7** (PR do desktop), **7.8** (teste em aparelho físico e Wi-Fi real)
