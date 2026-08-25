@@ -137,6 +137,10 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlists WHERE remoteId = :remoteId")
     suspend fun byRemoteId(remoteId: Long): PlaylistEntity?
 
+    /** O índice de `name` é único: o sync consulta antes de inserir. */
+    @Query("SELECT * FROM playlists WHERE name = :name")
+    suspend fun byName(name: String): PlaylistEntity?
+
     @Query("SELECT * FROM playlists WHERE searchName LIKE '%' || :query || '%'")
     fun search(query: String): Flow<List<PlaylistEntity>>
 

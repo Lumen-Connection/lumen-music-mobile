@@ -264,6 +264,7 @@
     <string name="sync_pin_prompt">Enter the PIN shown on your computer</string>
     <string name="sync_pair">Pair</string>
     <string name="sync_pair_failed">Wrong or expired PIN.</string>
+    <string name="sync_unreachable">Could not reach your computer. Check the address, the Wi-Fi network, and that Windows Firewall allows Lumen Music on private networks.</string>
     <string name="sync_paired_with">Paired with %1$s</string>
     <string name="sync_unpair">Unpair</string>
     <string name="sync_now">Sync now</string>

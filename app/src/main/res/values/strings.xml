@@ -286,6 +286,7 @@
     <string name="sync_pin_prompt">Digite o PIN mostrado no computador</string>
     <string name="sync_pair">Parear</string>
     <string name="sync_pair_failed">PIN incorreto ou expirado.</string>
+    <string name="sync_unreachable">Não foi possível falar com o computador. Confira o endereço, a rede Wi-Fi e se o Firewall do Windows liberou o Lumen Music em redes privadas.</string>
     <string name="sync_paired_with">Pareado com %1$s</string>
     <string name="sync_unpair">Desfazer pareamento</string>
     <string name="sync_now">Sincronizar agora</string>
