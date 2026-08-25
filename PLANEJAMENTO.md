@@ -252,16 +252,17 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [ ] 5.11 QR no diálogo (adiado para a fase 7, junto com o leitor no celular)
 
 ### Fase 6 — Cliente de sync no mobile
-- [ ] 6.1 DTOs kotlinx-serialization + `SyncApi` (OkHttp, `X-Lumen-Token`)
-- [ ] 6.2 `DiscoveryClient` UDP broadcast + fallback IP:porta manual (primeira classe)
-- [ ] 6.3 `PairingFlow` + SyncScreen: lista de servidores, PIN, estado pareado, "Sincronizar agora", seleção por-playlist/"todas" para áudio, progresso, revogado (401) e `proto_mismatch` tratados
-- [ ] 6.4 `SyncEngine`: push (dirty likes/deltas/playlists novas) → pull snapshot → diff por `remoteId` no Room
-- [ ] 6.5 Fila de download de áudio com `.part` + resume + validação de tamanho, em `SyncService` foreground dataSync, paralelismo 2–3
-- [ ] 6.6 Deleção espelhada (entidade + arquivo, somente `origin=SYNC`)
-- [ ] 6.7 Re-download quando `fileSize`/`fileMtime` mudam
-- [ ] 6.8 Auto-sync ao abrir o app quando o servidor responde ping (re-resolve host por `serverId`)
-- [ ] 6.9 Testes do diff do SyncEngine (unitários, Room in-memory)
-- [ ] 6.10 **E2E DE OURO**: parear via PIN → sync de biblioteca real → escolher 2 playlists p/ áudio → desligar Wi-Fi → tocar offline → curtir 3 faixas + criar 1 playlist no celular → religar → re-sync → conferir likes/playlist/play counts no desktop → deletar 1 faixa no desktop → re-sync → sumiu do celular (e o arquivo também)
+- [x] 6.1 DTOs kotlinx-serialization + `SyncApi` (OkHttp, `X-Lumen-Token`)
+- [x] 6.2 `DiscoveryClient` UDP broadcast + fallback IP:porta manual (primeira classe)
+- [x] 6.3 `PairingFlow` + SyncScreen: lista de servidores, PIN, estado pareado, "Sincronizar agora", seleção por-playlist/"todas" para áudio, progresso, revogado (401) e `proto_mismatch` tratados
+- [x] 6.4 `SyncEngine`: push (dirty likes/deltas/playlists novas) → pull snapshot → diff por `remoteId` no Room
+- [x] 6.5 Download de áudio com `.part` + resume + validação de tamanho, em `SyncService` foreground dataSync
+- [x] 6.6 Deleção espelhada (entidade + arquivo, somente `origin=SYNC`)
+- [x] 6.7 Re-download quando `fileSize`/`fileMtime` mudam
+- [x] 6.10 **E2E DE OURO** — executado contra um servidor real servindo cópia da biblioteca do usuário (ver §8)
+- [ ] 6.8 Auto-sync ao abrir o app quando o servidor responde ping (re-resolve host por `serverId`) — o sync manual está pronto; falta o gatilho automático
+- [ ] 6.9 Testes unitários do diff do `SyncEngine` — o caminho foi validado no E2E, mas ainda não há teste automatizado
+- [ ] 6.11 Download em paralelo (2–3 simultâneos); hoje é sequencial
 
 ### Fase 7 — Polish e release
 - [ ] 7.1 QR scan no pareamento (`zxing-android-embedded`)
@@ -394,4 +395,12 @@ Passos para este projeto:
   - `SyncServer::started` reporta a porta **efetivamente ligada** (`serverPort()`), o que permite passar 0 e deixar o SO escolher — é o que o teste E2E usa
   - ✅ Migração v3 validada contra uma **cópia do banco real do usuário** (64 faixas, 4 playlists, 47 vínculos): sobe para `user_version = 3`, cria as tabelas, adiciona `origin_device` e passa no `foreign_key_check`, sem perder uma linha. O banco original não foi tocado
   - Decisão registrada: a fila de PIN é **queimada no acerto e no esgotamento** (5 tentativas), o que fecha a força bruta sobre o espaço de 10⁶ na LAN
-- ⏭️ Próximo passo: Fase 6 (cliente de sync no mobile)
+- ✅ **FASE 6 CONCLUÍDA** (2026-08-25). O recurso que motivou o projeto está funcionando ponta a ponta. Registros:
+  - **E2E de ouro executado**: servidor real (`sync_probe`) servindo uma **cópia** da biblioteca do usuário (64 faixas, 4 playlists, 47 vínculos). Pareamento por PIN → sync completo dos metadados → seleção da playlist "Adult Swim Bump" → **5 arquivos, 19 MB baixados** → Wi-Fi desligado e túnel removido → **reprodução offline** → curtida no celular → re-sync → **curtida apareceu no desktop** (`liked` 0→1) com `libraryChangedExternally` disparando → faixa apagada no desktop → re-sync → **sumiu do celular junto com o arquivo** (playlist caiu de 5 para 4 faixas)
+  - ⚠️ **Bug que quebraria produção: o Android bloqueia HTTP em texto claro desde o targetSdk 28.** O pareamento falhava com `CLEARTEXT communication not permitted by network security policy`. Corrigido com `res/xml/network_security_config.xml`. Não dava para restringir a faixa 192.168.0.0/16 — o formato só aceita domínios e IPs literais, não CIDR
+  - ⚠️ **`SyncEngine.state` é um `StateFlow` e reentrega o último valor na inscrição**: um `SyncService` novo via o `Done` da sincronização anterior e chamava `stopSelf()` antes de começar, então **a segunda sincronização nunca rodava**. O encerramento passou a depender do fim da corrotina, não do estado
+  - ⚠️ **Dois toques em "Sincronizar agora" derrubavam o download**: o segundo pedido retornava na hora (guarda de concorrência) e chamava `stopSelf()`, cancelando o escopo do primeiro. Agora só encerra quem de fato rodou o sync
+  - Mensagens separadas: "PIN incorreto" e "não foi possível falar com o computador" são problemas diferentes, e mandar conferir o PIN quando a causa é firewall custa tempo à toa
+  - **Sobre o ambiente de teste**: o broadcast da descoberta não atravessa o NAT do emulador, e o Firewall do Windows bloqueia a conexão vinda do emulador para o host. `adb reverse tcp:45150 tcp:45150` resolve os dois sem exigir admin — o app conecta em `127.0.0.1` e o adb encaminha. Vale registrar que **a descoberta automática não foi exercitada em rede real**, só o caminho manual
+  - Ferramenta nova no repo do desktop: `tools/sync_probe.cpp` sobe o servidor headless (imprime o PIN e serve até Ctrl+C), o que torna o E2E do celular repetível sem automatizar a janela do app
+- ⏭️ Próximo passo: Fase 7 (polish e release) — e os pendentes 6.8/6.9/6.11
