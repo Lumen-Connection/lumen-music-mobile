@@ -280,4 +280,6 @@
     <string name="sync_audio_selection">Download audio from these playlists</string>
     <string name="sync_all_playlists">All playlists</string>
     <string name="sync_metadata_note">Library metadata always syncs in full; audio only for the playlists you pick.</string>
+    <string name="sync_continue_title">Pick up where you left off on your PC</string>
+    <string name="sync_continue_action">Resume</string>
 </resources>

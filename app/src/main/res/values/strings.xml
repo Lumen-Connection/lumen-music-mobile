@@ -302,4 +302,6 @@
     <string name="sync_audio_selection">Baixar áudio destas playlists</string>
     <string name="sync_all_playlists">Todas as playlists</string>
     <string name="sync_metadata_note">Os metadados da biblioteca inteira são sempre sincronizados; o áudio só das playlists escolhidas.</string>
+    <string name="sync_continue_title">Continuar de onde parou no PC</string>
+    <string name="sync_continue_action">Retomar</string>
 </resources>

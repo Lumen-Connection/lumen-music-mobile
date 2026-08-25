@@ -108,6 +108,17 @@ object PlayerController {
         loadAndPlay(track)
     }
 
+    /**
+     * Retoma uma faixa numa posição específica — usado pelo "continuar de onde
+     * parou no PC", que recebe do sync a posição em que o desktop estava.
+     */
+    fun playTrackAt(track: TrackEntity, context: List<Long>, contextName: String, positionMs: Long) {
+        queue.playTrack(track.id, context, contextName)
+        _contextName.value = contextName
+        markDirty()
+        loadAndPlay(track, seekToMs = positionMs)
+    }
+
     fun togglePlay() {
         if (!initialized) return
         if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()

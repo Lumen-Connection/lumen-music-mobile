@@ -22,6 +22,13 @@ enum class DensityMode { Comfortable, Compact }
 
 enum class LanguageMode { System, PtBr, En }
 
+/** Onde a reprodução parou no desktop, vinda do último snapshot. */
+data class DesktopPlayback(
+    val trackRemoteId: Long,
+    val positionMs: Long,
+    val contextName: String,
+)
+
 /** Servidor desktop pareado (fase 6). Nulo enquanto não houver pareamento. */
 data class PairedServer(
     val serverId: String,
@@ -58,6 +65,12 @@ class SettingsRepository(private val context: Context) {
         val lastSyncAt = longPreferencesKey("last_sync_at")
         val syncAllPlaylists = booleanPreferencesKey("sync_all_playlists")
         val deviceId = stringPreferencesKey("device_id")
+
+        // Onde a reprodução parou no desktop, para oferecer "continuar de onde
+        // parou no PC". Guardado por `remoteId` porque os ids locais diferem.
+        val desktopTrackRemoteId = longPreferencesKey("desktop_track_remote_id")
+        val desktopPositionMs = longPreferencesKey("desktop_position_ms")
+        val desktopContextName = stringPreferencesKey("desktop_context_name")
     }
 
     private val prefs: Flow<Preferences> = context.dataStore.data
@@ -107,6 +120,29 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setSyncAllPlaylists(v: Boolean) = edit { it[Keys.syncAllPlaylists] = v }
     suspend fun setLastSyncAt(ts: Long) = edit { it[Keys.lastSyncAt] = ts }
+
+    /** Estado de reprodução que veio do desktop no último snapshot. */
+    val desktopPlayback: Flow<DesktopPlayback?> = prefs.map { p ->
+        val remoteId = p[Keys.desktopTrackRemoteId] ?: return@map null
+        if (remoteId <= 0) null
+        else DesktopPlayback(
+            trackRemoteId = remoteId,
+            positionMs = p[Keys.desktopPositionMs] ?: 0,
+            contextName = p[Keys.desktopContextName].orEmpty(),
+        )
+    }
+
+    suspend fun saveDesktopPlayback(playback: DesktopPlayback?) = edit {
+        if (playback == null) {
+            it.remove(Keys.desktopTrackRemoteId)
+            it.remove(Keys.desktopPositionMs)
+            it.remove(Keys.desktopContextName)
+        } else {
+            it[Keys.desktopTrackRemoteId] = playback.trackRemoteId
+            it[Keys.desktopPositionMs] = playback.positionMs
+            it[Keys.desktopContextName] = playback.contextName
+        }
+    }
 
     suspend fun savePairedServer(server: PairedServer) = edit {
         it[Keys.syncServerId] = server.serverId

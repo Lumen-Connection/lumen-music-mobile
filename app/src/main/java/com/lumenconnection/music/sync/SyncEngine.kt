@@ -70,6 +70,18 @@ object SyncEngine {
             val snapshot = api.library()
             applySnapshot(context, snapshot)
 
+            // Guarda onde o desktop parou, para oferecer "continuar de onde
+            // parou no PC". Só o estado desce — o celular nunca manda o seu.
+            val remote = snapshot.playbackState
+            settings.saveDesktopPlayback(
+                if (remote == null || remote.currentTrackId <= 0) null
+                else com.lumenconnection.music.config.DesktopPlayback(
+                    trackRemoteId = remote.currentTrackId,
+                    positionMs = remote.positionMs,
+                    contextName = remote.contextName,
+                )
+            )
+
             downloadSelectedAudio(context, api)
 
             settings.setLastSyncAt(System.currentTimeMillis())

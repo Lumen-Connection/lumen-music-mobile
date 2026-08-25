@@ -49,6 +49,7 @@ import com.lumenconnection.music.ui.PageHeader
 import com.lumenconnection.music.ui.SectionHeader
 import com.lumenconnection.music.ui.theme.LumenText
 import com.lumenconnection.music.ui.theme.LumenTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
@@ -122,6 +123,7 @@ fun SyncScreen(nav: NavHostController) {
             }
 
             SyncStatusCard(syncState)
+            ContinueFromDesktopCard()
 
             // --- Seleção de áudio ---
             SectionHeader(stringResource(R.string.sync_audio_selection))
@@ -208,6 +210,56 @@ private fun SyncStatusCard(state: SyncEngine.State) {
         Text(
             text,
             style = LumenText.body.copy(color = if (isError) colors.danger else colors.text),
+        )
+    }
+}
+
+/**
+ * "Continuar de onde parou no PC": o snapshot traz o estado de reprodução do
+ * desktop, e se a faixa já estiver baixada aqui dá para retomar na mesma
+ * posição. Só aparece quando é acionável — sem arquivo local não haveria o que
+ * tocar.
+ */
+@Composable
+private fun ContinueFromDesktopCard() {
+    val scope = rememberCoroutineScope()
+    val desktop by Graph.settings.desktopPlayback.collectAsStateWithLifecycle(initialValue = null)
+
+    var track by remember { mutableStateOf<com.lumenconnection.music.db.TrackEntity?>(null) }
+
+    LaunchedEffect(desktop) {
+        val remoteId = desktop?.trackRemoteId
+        track = if (remoteId == null) null
+        else Graph.db.trackDao().byRemoteId(remoteId)?.takeIf { !it.filePath.isNullOrBlank() }
+    }
+
+    val playback = desktop ?: return
+    val available = track ?: return
+
+    LumenCard {
+        Text(stringResource(R.string.sync_continue_title), style = LumenText.body)
+        Text(
+            "${available.artist} — ${available.title}",
+            style = LumenText.bodySm,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        AccentButton(
+            text = stringResource(R.string.sync_continue_action),
+            onClick = {
+                scope.launch {
+                    val contextIds = Graph.db.trackDao().observeAll().first().map { it.id }
+                    com.lumenconnection.music.player.PlayerController.playTrackAt(
+                        track = available,
+                        context = contextIds,
+                        contextName = playback.contextName,
+                        positionMs = playback.positionMs,
+                    )
+                    // Consome: retomar duas vezes seguidas no mesmo ponto não faz sentido.
+                    Graph.settings.saveDesktopPlayback(null)
+                }
+            },
+            modifier = Modifier.padding(top = LumenTheme.dimens.spacingSm),
         )
     }
 }

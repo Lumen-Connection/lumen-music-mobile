@@ -9,8 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.lumenconnection.music.player.PlayerController
+import com.lumenconnection.music.sync.AutoSync
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +40,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         requestNotificationPermissionIfNeeded()
         setContent { ThemedApp() }
+
+        // Sincroniza sozinho quando o PC está ao alcance. Falhar aqui é normal
+        // (fora de casa, PC desligado) e não deve atrapalhar nada.
+        lifecycleScope.launch {
+            runCatching { AutoSync.maybeSync(this@MainActivity) }
+                .onFailure { Log.w("MainActivity", "auto-sync não pôde rodar", it) }
+        }
     }
 
     /**
