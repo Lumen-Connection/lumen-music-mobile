@@ -271,7 +271,7 @@ Threading/DB: a thread do servidor abre **conexão `QSqlDatabase` própria** (no
 - [x] 7.5 Keystore `d:\HubLumen\.secrets\lumen-music-mobile.keystore` + 4 secrets no repo
 - [x] 7.6 Tag `v0.1.0` → APKs no GitHub Releases; README PT/EN com troubleshooting de firewall + LICENSE GPLv3
 - [ ] 7.1 QR no pareamento — **adiado de propósito**: exige vendorizar o qrcodegen no desktop e uma dependência de câmera no celular, para substituir 6 dígitos que já funcionam. Fazer só se o PIN incomodar na prática (par com o item 5.11)
-- [ ] 7.7 Desktop: abrir PR da branch `feature/lan-sync` e cortar release `v2.1.x` (coordenar com o roadmap 2.1 existente — TagLib/Álbuns — que NÃO faz parte deste plano)
+- [x] 7.7 Desktop: PR #28 aberto e **mergeado em main pelo usuário**; release **v2.1.0** publicada. O roadmap 2.1 anterior (TagLib, páginas de álbum/artista, prateleiras de descoberta) **não entrou** e seguiu para `Unreleased` no CHANGELOG
 - [ ] 7.8 Testar o release em aparelho físico e em rede Wi-Fi real (o E2E rodou no emulador com `adb reverse`)
 
 ## 5. Riscos conhecidos
@@ -409,4 +409,9 @@ Passos para este projeto:
   - **"Continuar de onde parou no PC"** validado: desktop parado em 95 s → celular retomou em 97 s, no mesmo contexto
   - **Release assinado testado** (x86_64, R8 + shrink): launch, pareamento, sync de 63 faixas e retomada. As regras de keep preservam os serializers do kotlinx.serialization
   - Strings: **237 chaves, PT e EN completos**, conferido por script
-- ⏭️ Pendentes conscientes: 6.8 já feito; **6.9** (testes do diff do SyncEngine), **6.11** (download paralelo), **7.1** (QR), **7.7** (PR do desktop), **7.8** (teste em aparelho físico e Wi-Fi real)
+- ✅ **DESKTOP v2.1.0 PUBLICADA** (2026-08-25). PR #28 mergeado em `main` pelo usuário; tag `v2.1.0` cortada. Registros:
+  - ⚠️ O workflow `release.yml` tem uma **trava de versão**: a tag precisa bater com o `PROJECT_VERSION` do `CMakeLists.txt`, e as notas da release são extraídas da seção correspondente do `CHANGELOG.md`. Ou seja, **antes de qualquer tag é preciso subir o `project(LumenMusic VERSION ...)` e escrever a seção no CHANGELOG** — só marcar a tag falha o build
+  - O instalador e o `VERSIONINFO` derivam do `PROJECT_VERSION`, então não há segunda versão a manter em sincronia
+  - Antes de publicar, reproduzi localmente o que o CI faz: build com `-DLUMEN_BUILD_TESTS=ON`, `ctest` (14/14), `cmake --install` da árvore plana, conferência de que o executável ficou carimbado como 2.1.0.0 e de que o `platforms/qwindows.dll` está lá, e a canária de i18n (exit 0)
+  - O CI do desktop compila com **Qt 6.8.3**, não com o 6.10.2 local — o módulo de sync só usa APIs antigas (QTcpServer, QUdpSocket, QNetworkDatagram, QCryptographicHash), então não há divergência
+- ⏭️ Pendentes conscientes: **6.9** (testes do diff do SyncEngine), **6.11** (download paralelo), **7.1** (QR no pareamento), **7.8** (teste em aparelho físico e Wi-Fi real — a descoberta automática nunca rodou fora do emulador)
